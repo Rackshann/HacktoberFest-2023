@@ -1,65 +1,54 @@
-// C++ program to check if a number is a Kaprekar number for a specific base.
-
 #include <iostream>
-#include <cmath>
+#include <vector>
+#include <algorithm>
+
 using namespace std;
 
-bool isKaprekar(int number, int base)
-{
-    if (number < 0 || base <= 1)
-    {
-        return false;
+// Function to convert a number from base 10 to any base
+vector<int> convertBase(int n, int base) {
+    vector<int> digits;
+    while (n > 0) {
+        digits.push_back(n % base);
+        n /= base;
     }
-    long long squared = static_cast<long long>(number) * number;
-    long long divisor = 1;
-    while (squared / divisor >= base)
-    {
-        divisor *= base;
-    }
-    while (divisor > 0)
-    {
-        long long left = squared / divisor;
-        long long right = squared % divisor;
-        if (left + right == number && right > 0)
-        {
+    reverse(digits.begin(), digits.end());
+    return digits;
+}
+
+// Function to check if a number is a Kaprekar number in a specific base
+bool isKaprekar(int n, int base) {
+    vector<int> digits = convertBase(n, base);
+    int square = n * n;
+    vector<int> squareDigits = convertBase(square, base);
+
+    // Check all possible splits of the square
+    for (int i = 1; i < squareDigits.size(); i++) {
+        int left = 0, right = 0;
+        for (int j = 0; j < i; j++) {
+            left = left * base + squareDigits[j];
+        }
+        for (int j = i; j < squareDigits.size(); j++) {
+            right = right * base + squareDigits[j];
+        }
+        if (left + right == n) {
             return true;
         }
-        divisor /= base;
     }
     return false;
 }
-int main()
-{
-    int number, base;
+
+int main() {
+    int n, base;
     cout << "Enter a number: ";
-    cin >> number;
+    cin >> n;
     cout << "Enter the base: ";
     cin >> base;
-    if (isKaprekar(number, base))
-    {
-        cout << number << " is a Kaprekar number in base " << base << endl;
+
+    if (isKaprekar(n, base)) {
+        cout << n << " is a Kaprekar number in base " << base << endl;
+    } else {
+        cout << n << " is not a Kaprekar number in base " << base << endl;
     }
-    else
-    {
-        cout << number << " is not a Kaprekar number in base " << base << endl;
-    }
+
     return 0;
 }
-
-// Output:
-
-// Enter a number: 9
-// Enter the base: 10
-// 9 is a Kaprekar number in base 10
-// Enter a number: 45
-// Enter the base: 10
-// 45 is a Kaprekar number in base 10
-// Enter a number: 297
-// Enter the base: 10// 297 is a Kaprekar number in base 10
-
-// Non Kaprekar Numbers
-// Enter a number: 13
-// Enter the base: 10
-// 13 is not a Kaprekar number in base 10
-// Enter a number: 19
-// Enter the base: 10// 19 is not a Kaprekar number in base 10
